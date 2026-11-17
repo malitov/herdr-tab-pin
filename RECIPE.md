@@ -3,9 +3,7 @@
 Herdr's own tab bar, plus pinning. Right-click a tab and choose **Pin**: the tab jumps to the front of
 the bar, shows a small pin after its name and loses its ×. A pinned tab can't be closed by accident:
 cmd-w (or the menu's Close) shows a toast "Tab is pinned · Unpin it to close it" whose action unpins
-and closes it. Pins survive restarts and layout switches. If the
-[space-welcome](https://github.com/malitov/herdr-space-welcome) mod is installed, closing a space's
-last tab opens its welcome page instead of closing the space.
+and closes it. Pins survive restarts and layout switches.
 
 ![Tab Pin](preview.png)
 
@@ -42,9 +40,7 @@ room for the traffic lights, as Herdr's `tabs` does).
   `tab.next` / `tab.prev` follow the same order.
 - **Close** (×, menu, key `tab-pin.close`): pinned → toast (`notify`, pin icon) with action
   `tab-pin.unpin-close`; the tab's id waits in shared `"tab-pin.unpinclose"`, and the action unpins it
-  and closes it. Unpinned, and the space's last tab, and `mods/space-welcome` exists →
-  `tab.new {space, name: "Welcome", mod: "space-welcome", props: {space}}` then
-  `tab.close {id, confirmed: true}`. Otherwise plain `tab.close {id}` (Herdr asks before a space goes).
+  and closes it. Unpinned → plain `tab.close {id}` (Herdr asks before a space's last tab goes).
 - Files / Changes: open and close the layout's `panel` column on that child of `panel-body`;
   remembered per space in the mod's `localStorage`.
 
@@ -58,11 +54,9 @@ room for the traffic lights, as Herdr's `tabs` does).
   and `render()` draws the menu when `props().menu` is set (a focus handle for ↑/↓, Enter, Esc).
 - Keys arrive through `nextCommand()`: `close`, `pin`, `unpin-close`.
 - `herdr` used: `spaces`, `panes`, `run`, `openOverlay`, `closeOverlay`, `theme`, `window`, `shared`,
-  `setShared`, `layout`, `settings`, `props`, `nextCommand`, `notify`, `exec`, `home`, `keys`,
-  `checking`. Commands: `tab.select`, `tab.rename`, `tab.move`, `tab.new`, `tab.close`, `tab.prev`,
+  `setShared`, `layout`, `settings`, `props`, `nextCommand`, `notify`, `keys`, `checking`.
+  Commands: `tab.select`, `tab.rename`, `tab.move`, `tab.new`, `tab.close`, `tab.prev`,
   `tab.next`, `layout.select`, `layout.show`, `layout.hide`, `window.*`.
-- Program run: `test -d ~/.config/herdr-app/mods/space-welcome`, once at start, to learn whether
-  space-welcome is installed.
 - Art (copied into the mod, lucide, tinted): `pin.svg`, `pin-off.svg`, `square-pen.svg`, `plus.svg`,
   `close.svg` (also the menu's Close), `spinner.svg`, and Herdr's Windows buttons `win-*.svg`. It also shows the
   shipped `mods/files/file.svg` and `mods/changes/changes.svg`.
@@ -79,7 +73,6 @@ room for the traffic lights, as Herdr's `tabs` does).
 - Don't run side effects under `checking()`: `herdr-app check` renders with empty state.
 - The pinned toast's action is a mod command with no args, hence the id in shared state.
 - The Files / Changes toggles assume the layout has `panel` and `panel-body` nodes, as Herdr's `main` does.
-- The space-welcome check happens once: install it, then reload the mod (save any file) or restart.
 
 ## Done when
 
@@ -88,5 +81,4 @@ room for the traffic lights, as Herdr's `tabs` does).
   its × is gone.
 - cmd-w on the pinned tab → toast "Tab is pinned"; its action → the tab unpins and closes.
 - `shared.json` `"tab-pin.pinned"` holds only live tab ids.
-- Close a space's only tab with space-welcome installed → the space stays, showing the Welcome tab.
 - Delete the layout file: `mods/tab-pin/` is still there and works in the next layout that uses it.

@@ -1,6 +1,6 @@
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex, ScrollHandle } from "gpui-base";
-import { spaces, panes, run, openOverlay, closeOverlay, theme, window, shared, setShared, layout, settings, props, nextCommand, notify, exec, home, keys, checking } from "herdr";
+import { spaces, panes, run, openOverlay, closeOverlay, theme, window, shared, setShared, layout, settings, props, nextCommand, notify, keys, checking } from "herdr";
 
 // Pinned tabs: their ids in shared state, so a pin outlives a restart and a layout switch.
 const PINS = "tab-pin.pinned";
@@ -36,20 +36,12 @@ function shortcut(action) {
 }
 
 // Every close of a tab from this bar or its keys comes here. A pinned tab doesn't close: a toast
-// offers Unpin and close. A space's last tab opens the space-welcome mod (if installed) in its place,
-// so the space stays; without it, Herdr's own close (which asks before the space goes).
-let welcome = false;
+// offers Unpin and close. Any other tab gets Herdr's own close (which asks before a space's last tab goes).
 function closeTab(id) {
   if (!id) return;
   if (pins().has(id)) {
     setShared("tab-pin.unpinclose", id);
     notify({ title: "Tab is pinned", body: "Unpin it to close it.", icon: "mods/tab-pin/pin.svg", action: { name: "tab-pin.unpin-close" } });
-    return;
-  }
-  const space = spaces().find(s => s.tabs.some(t => t.id === id));
-  if (welcome && space?.tabs.length === 1) {
-    run("tab.new", { space: space.id, name: "Welcome", mod: "space-welcome", props: { space: space.id } });
-    run("tab.close", { id, confirmed: true });
     return;
   }
   run("tab.close", { id });
@@ -89,7 +81,6 @@ export default class Tabs extends View {
       return;
     }
     if (!checking()) {
-      exec("test", ["-d", `${home()}/.config/herdr-app/mods/space-welcome`]).then(r => { welcome = r.code === 0; }).catch(() => {});
       // Keys: close (cmd-w), pin (toggle the shown tab), unpin-close (the pinned toast's button).
       cx.spawn(async (cx) => {
         for (;;) {
