@@ -72,6 +72,15 @@ function label(tab, lead) {
   return (tab.name === prog || !tab.named) && telling ? live : base;
 }
 
+// Copies the tab id with what an agent needs to reach it: hc (herdr-core) works on terminal ids, and the
+// `herdr` on PATH may be the separate Herdr TUI, which knows nothing of this app's tabs.
+function copyTabId(cx, id) {
+  const ts = panes().filter(p => p.tab === id && p.terminal).map(p => p.terminal);
+  const text = `Herdr app tab ${id}` + (ts.length ? `, terminals ${ts.join(", ")} (read: hc read ${ts[0]}; type: hc send ${ts[0]} "...")` : ` (no terminals; see herdr-app ls)`);
+  cx.write_to_clipboard(text);
+  notify({ title: "Tab ID copied", body: text });
+}
+
 export default class Tabs extends View {
   init(_props, cx) {
     if (props()?.menu) {
@@ -159,7 +168,7 @@ export default class Tabs extends View {
     const rows = [
       { label: pinned ? "Unpin" : "Pin", icon: pinned ? "pin-off" : "pin", act: () => togglePin(id), keys: shortcut("tab-pin.pin") },
       { label: "Rename", icon: "square-pen", act: () => run("tab.rename", { id }), keys: shortcut("tab.rename") },
-      { label: "Copy Tab ID", icon: "copy", act: (cx) => { cx.write_to_clipboard(id); notify({ title: "Tab id copied", body: id }); }, keys: "" },
+      { label: "Copy Tab ID", icon: "copy", act: (cx) => copyTabId(cx, id), keys: "" },
       { label: "New tab", icon: "plus", act: () => run("tab.new", { space }), keys: shortcut("tab.new") },
       { label: "Close", icon: "close", sep: true, act: () => closeTab(id), keys: shortcut("tab-pin.close") || shortcut("tab.close") },
     ];
