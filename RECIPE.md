@@ -22,9 +22,9 @@ room for the traffic lights, as Herdr's `tabs` does).
 - **Right side**: `+` (26px square button, opens Herdr's `new-menu` popup 250×512), then **Files** and
   **Changes** toggles (shown per shared `workspace.panels`, default both), then window buttons where the
   system draws none.
-- **Tab menu** (right-click a tab): a popup 210×145, `popover` background, 5px padding, text 12.8px.
+- **Tab menu** (right-click a tab): a popup 210×176, `popover` background, 5px padding, text 12.8px.
   Rows 31px, radius 7, 14px icon in `muted`, label, the bound key in 11px `dim` on the right, written the platform's way (`cmd-shift-k` is ⇧⌘K on macOS, Super+Shift+K elsewhere, as Herdr's `new-menu` does):
-  Pin / Unpin (pin / pin-off icon), Rename, New tab, a 1px `border` line, Close.
+  Pin / Unpin (pin / pin-off icon), Rename, Copy Tab ID (copy icon: writes the tab id to the clipboard and notifies "Tab id copied"), New tab, a 1px `border` line, Close.
 
 ## How it behaves
 

@@ -153,22 +153,23 @@ export default class Tabs extends View {
     localStorage.setItem("panels", JSON.stringify(this.panels));
   }
 
-  // The tab's right-click menu: Pin/Unpin, Rename, New tab, Close. ↑/↓ move, Enter runs, Esc closes.
+  // The tab's right-click menu: Pin/Unpin, Rename, Copy Tab ID, New tab, Close. ↑/↓ move, Enter runs, Esc closes.
   renderMenu() {
     const t = theme(), { id, space } = props().menu, pinned = pins().has(id);
     const rows = [
       { label: pinned ? "Unpin" : "Pin", icon: pinned ? "pin-off" : "pin", act: () => togglePin(id), keys: shortcut("tab-pin.pin") },
       { label: "Rename", icon: "square-pen", act: () => run("tab.rename", { id }), keys: shortcut("tab.rename") },
+      { label: "Copy Tab ID", icon: "copy", act: (cx) => { cx.write_to_clipboard(id); notify({ title: "Tab id copied", body: id }); }, keys: "" },
       { label: "New tab", icon: "plus", act: () => run("tab.new", { space }), keys: shortcut("tab.new") },
       { label: "Close", icon: "close", sep: true, act: () => closeTab(id), keys: shortcut("tab-pin.close") || shortcut("tab.close") },
     ];
-    const choose = (i) => { closeOverlay(props().overlay); rows[i]?.act(); };
+    const choose = (i, cx) => { closeOverlay(props().overlay); rows[i]?.act(cx); };
     return v_flex().id("menu").track_focus(this.handle).w_full().p(5).bg(t.popover).text_size(12.8)
       .on_key_down((e, cx) => {
         if (e.key === "escape") return closeOverlay(props().overlay);
         if (e.key === "down") this.at = (this.at + 1) % rows.length;
         else if (e.key === "up") this.at = (this.at + rows.length - 1) % rows.length;
-        else if (e.key === "enter") return choose(this.at);
+        else if (e.key === "enter") return choose(this.at, cx);
         else return;
         cx.notify();
       })
@@ -176,7 +177,7 @@ export default class Tabs extends View {
         .when(Boolean(it.sep), el => el.child(div().mx(7).my(4).h(1).bg(t.border)))
         .child(h_flex().id(`mi-${i}`).h(31).px(8).gap(9).rounded(7).items_center().text_color(t.foreground)
           .when(i === this.at, el => el.bg(t.selected)).hover(s => s.bg(t.hover))
-          .on_click(() => choose(i))
+          .on_click((_e, cx) => choose(i, cx))
           .child(svg(`mods/tab-pin/${it.icon}.svg`).size(14).flex_none().text_color(t.muted))
           .child(div().flex_1().child(it.label))
           .child(div().text_size(11).text_color(t.dim).child(it.keys)))));
@@ -225,7 +226,7 @@ export default class Tabs extends View {
           if (from !== null && from !== i) run("tab.move", { id: shown[from].id, index: space.tabs.findIndex(x => x.id === c.id) + 1 });
           else run("tab.select", { id: c.id });
         })
-        .on_mouse_down("right", (_e, cx) => { cx.stop_propagation(); openOverlay({ mod: "tab-pin", kind: "popup", width: 210, height: 145, props: { menu: { id: c.id, space: space.id } } }); })
+        .on_mouse_down("right", (_e, cx) => { cx.stop_propagation(); openOverlay({ mod: "tab-pin", kind: "popup", width: 210, height: 176, props: { menu: { id: c.id, space: space.id } } }); })
         .when(Boolean(program?.icon), el => el.child(program.tint ? svg(program.icon).size(14).text_color(t.muted) : image(program.icon).size(14)))
         .child(div().max_w(170).truncate().child(c.zoomed ? `${name} Z` : name))
         .when(pinned.has(c.id), el => el.child(svg("mods/tab-pin/pin.svg").size(12).flex_none().text_color(t.dim)))
