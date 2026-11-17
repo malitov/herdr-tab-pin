@@ -40,7 +40,7 @@ room for the traffic lights, as Herdr's `tabs` does).
   `tab.next` / `tab.prev` follow the same order.
 - **Close** (×, menu, key `tab-pin.close`): pinned → toast (`notify`, pin icon) with action
   `tab-pin.unpin-close`; the tab's id waits in shared `"tab-pin.unpinclose"`, and the action unpins it
-  and closes it. Unpinned → plain `tab.close {id}` (Herdr asks before a space's last tab goes).
+  and closes it. Unpinned with an agent that is `working` or `blocked` in the tab → Herdr's `confirm` dialog ("Close tab …?", "<agent> is still running in it. Closing ends it."), which runs `tab.close {id, confirmed: true}`. Otherwise plain `tab.close {id}` (Herdr asks before a space's last tab goes).
 - Files / Changes: open and close the layout's `panel` column on that child of `panel-body`;
   remembered per space in the mod's `localStorage`.
 

@@ -1,6 +1,6 @@
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex, ScrollHandle } from "gpui-base";
-import { spaces, panes, run, openOverlay, closeOverlay, theme, window, shared, setShared, layout, settings, props, nextCommand, notify, keys, checking } from "herdr";
+import { spaces, panes, agents, run, openOverlay, closeOverlay, theme, window, shared, setShared, layout, settings, props, nextCommand, notify, keys, checking } from "herdr";
 
 // Pinned tabs: their ids in shared state, so a pin outlives a restart and a layout switch.
 const PINS = "tab-pin.pinned";
@@ -36,12 +36,25 @@ function shortcut(action) {
 }
 
 // Every close of a tab from this bar or its keys comes here. A pinned tab doesn't close: a toast
-// offers Unpin and close. Any other tab gets Herdr's own close (which asks before a space's last tab goes).
+// offers Unpin and close. A tab with a busy agent asks first. Any other tab gets Herdr's own close (which asks
+// before a space's last tab goes).
 function closeTab(id) {
   if (!id) return;
   if (pins().has(id)) {
     setShared("tab-pin.unpinclose", id);
     notify({ title: "Tab is pinned", body: "Unpin it to close it.", icon: "mods/tab-pin/pin.svg", action: { name: "tab-pin.unpin-close" } });
+    return;
+  }
+  // An agent that works or waits on the person ends with the tab: ask first (Herdr's own dialog).
+  const busy = agents().filter(a => a.tab === id && (a.status === "working" || a.status === "blocked"));
+  if (busy.length) {
+    const names = [...new Set(busy.map(a => a.program?.name ?? a.app ?? "An agent"))].join(", ");
+    const tab = spaces().flatMap(s => s.tabs).find(c => c.id === id);
+    openOverlay({ mod: "confirm", kind: "dialog", width: 400, height: 170, props: {
+      title: `Close tab ${tab?.named ? `"${tab.name}"` : ""}?`.replace(" ?", "?"),
+      detail: busy.length === 1 ? `${names} is still running in it. Closing ends it.` : `${busy.length} agents are still running in it (${names}). Closing ends them.`,
+      command: { name: "tab.close", args: { id, confirmed: true } },
+    } });
     return;
   }
   run("tab.close", { id });
