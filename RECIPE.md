@@ -25,7 +25,7 @@ room for the traffic lights, as Herdr's `tabs` does).
   **Changes** toggles (shown per shared `workspace.panels`, default both), then window buttons where the
   system draws none.
 - **Tab menu** (right-click a tab): a popup 210×145, `popover` background, 5px padding, text 12.8px.
-  Rows 31px, radius 7, 14px icon in `muted`, label, the bound key in 11px `dim` on the right, written the platform's way (`cmd-alt-p` is ⌥⌘P on macOS, Super+Alt+P elsewhere, as Herdr's `new-menu` does):
+  Rows 31px, radius 7, 14px icon in `muted`, label, the bound key in 11px `dim` on the right, written the platform's way (`cmd-shift-k` is ⇧⌘K on macOS, Super+Shift+K elsewhere, as Herdr's `new-menu` does):
   Pin / Unpin (pin / pin-off icon), Rename, New tab, a 1px `border` line, Close.
 
 ## How it behaves
@@ -66,7 +66,7 @@ room for the traffic lights, as Herdr's `tabs` does).
 - Art (copied into the mod, lucide, tinted): `pin.svg`, `pin-off.svg`, `square-pen.svg`, `plus.svg`,
   `close.svg` (also the menu's Close), `spinner.svg`, and Herdr's Windows buttons `win-*.svg`. It also shows the
   shipped `mods/files/file.svg` and `mods/changes/changes.svg`.
-- `keys.json`: `"cmd-w": "tab-pin.close"`, `"cmd-alt-p": "tab-pin.pin"` in `global`. If the layout has
+- `keys.json`: `"cmd-w": "tab-pin.close"`, `"cmd-shift-k": "tab-pin.pin"` in `global`. If the layout has
   its own `layout:<name>` section binding cmd-w, set it there too (it wins over global).
 
 ## Watch out

@@ -1,6 +1,6 @@
 {
   "global": {
     "cmd-w": "tab-pin.close",
-    "cmd-alt-p": "tab-pin.pin"
+    "cmd-shift-k": "tab-pin.pin"
   }
 }

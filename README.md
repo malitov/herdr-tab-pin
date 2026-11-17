@@ -25,7 +25,7 @@ The mod runs one program at start: `test -d ~/.config/herdr-app/mods/space-welco
 | Key | Action |
 |---|---|
 | cmd-w | Close the shown tab. A pinned tab does not close. |
-| cmd-alt-p | Pin or unpin the shown tab. |
+| cmd-shift-k | Pin or unpin the shown tab. |
 
 ## Build it yourself
 
