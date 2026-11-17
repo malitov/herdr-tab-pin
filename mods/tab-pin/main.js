@@ -5,9 +5,8 @@ import { spaces, panes, run, openOverlay, closeOverlay, theme, window, shared, s
 // Pinned tabs: their ids in shared state, so a pin outlives a restart and a layout switch.
 const PINS = "tab-pin.pinned";
 const pins = () => new Set(shared(PINS) ?? []);
-const allTabs = () => spaces().flatMap(s => s.tabs);
 // Drops ids of tabs that are gone, so the list never grows.
-const setPins = (ids) => { const live = new Set(allTabs().map(t => t.id)); setShared(PINS, [...ids].filter(id => live.has(id))); };
+const setPins = (ids) => { const live = new Set(spaces().flatMap(s => s.tabs).map(t => t.id)); setShared(PINS, [...ids].filter(id => live.has(id))); };
 const togglePin = (id) => { const p = pins(); p.has(id) ? p.delete(id) : p.add(id); setPins(p); };
 const activeTab = () => spaces().find(s => s.active)?.tabs.find(t => t.active)?.id;
 
@@ -83,7 +82,7 @@ export default class Tabs extends View {
           else if (c === "pin" && activeTab()) togglePin(activeTab());
           else if (c === "unpin-close") {
             const id = shared("tab-pin.unpinclose");
-            if (id) { const p = pins(); p.delete(id); setPins(p); closeTab(id); }
+            if (id) { togglePin(id); closeTab(id); }
           }
           cx.notify();
         }
@@ -154,7 +153,7 @@ export default class Tabs extends View {
       { label: pinned ? "Unpin" : "Pin", icon: pinned ? "pin-off" : "pin", act: () => togglePin(id), keys: shortcut("tab-pin.pin") },
       { label: "Rename", icon: "square-pen", act: () => run("tab.rename", { id }), keys: shortcut("tab.rename") },
       { label: "New tab", icon: "plus", act: () => run("tab.new", { space }), keys: shortcut("tab.new") },
-      { label: "Close", icon: "x", sep: true, act: () => closeTab(id), keys: shortcut("tab-pin.close") || shortcut("tab.close") },
+      { label: "Close", icon: "close", sep: true, act: () => closeTab(id), keys: shortcut("tab-pin.close") || shortcut("tab.close") },
     ];
     const choose = (i) => { closeOverlay(props().overlay); rows[i]?.act(); };
     return v_flex().id("menu").track_focus(this.handle).w_full().p(5).bg(t.popover).text_size(12.8)

@@ -64,7 +64,7 @@ room for the traffic lights, as Herdr's `tabs` does).
 - Program run: `test -d ~/.config/herdr-app/mods/space-welcome`, once at start, to learn whether
   space-welcome is installed.
 - Art (copied into the mod, lucide, tinted): `pin.svg`, `pin-off.svg`, `square-pen.svg`, `plus.svg`,
-  `x.svg`, `close.svg`, `spinner.svg`, and Herdr's Windows buttons `win-*.svg`. It also shows the
+  `close.svg` (also the menu's Close), `spinner.svg`, and Herdr's Windows buttons `win-*.svg`. It also shows the
   shipped `mods/files/file.svg` and `mods/changes/changes.svg`.
 - `keys.json`: `"cmd-w": "tab-pin.close"`, `"cmd-alt-p": "tab-pin.pin"` in `global`. If the layout has
   its own `layout:<name>` section binding cmd-w, set it there too (it wins over global).
