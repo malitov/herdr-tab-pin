@@ -10,11 +10,27 @@ const setPins = (ids) => { const live = new Set(spaces().flatMap(s => s.tabs).ma
 const togglePin = (id) => { const p = pins(); p.has(id) ? p.delete(id) : p.add(id); setPins(p); };
 const activeTab = () => spaces().find(s => s.active)?.tabs.find(t => t.active)?.id;
 
+// A key as the platform writes it: "cmd-alt-p" is ⌥⌘P on macOS, Super+Alt+P elsewhere (as Herdr's new-menu).
+function pretty(text) {
+  const mac = window()?.platform === "macos";
+  const names = mac ? { ctrl: "⌃", alt: "⌥", shift: "⇧", cmd: "⌘", fn: "fn" } : { ctrl: "Ctrl", alt: "Alt", shift: "Shift", cmd: "Super", fn: "Fn" };
+  const alias = { secondary: mac ? "cmd" : "ctrl", super: "cmd", win: "cmd" };
+  return text.trim().split(/\s+/).map(stroke => {
+    const parts = stroke.split("-");
+    let key = parts.pop();
+    if (key === "") { key = "-"; parts.pop(); }
+    const held = new Set(parts.map(m => alias[m.toLowerCase()] ?? m.toLowerCase()));
+    if (/^[A-Z]$/.test(key)) held.add("shift");
+    const label = key.length === 1 ? key.toUpperCase() : key[0].toUpperCase() + key.slice(1).toLowerCase();
+    return [...Object.keys(names).filter(m => held.has(m)).map(m => names[m]), label].join(mac ? "" : "+");
+  }).join(" ");
+}
+
 // The key bound to an action, for the menu: this layout's own section first, then global.
 function shortcut(action) {
   for (const section of [`layout:${shared("layout")}`, "global"]) {
     const k = keys().find(b => b.section === section && b.action === action);
-    if (k) return k.keys;
+    if (k?.keys.trim()) return pretty(k.keys);
   }
   return "";
 }
