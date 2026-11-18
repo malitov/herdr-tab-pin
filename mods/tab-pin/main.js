@@ -264,7 +264,7 @@ export default class Tabs extends View {
     const panel = find(root, "panel"), body = find(root, "panel-body");
     const enabled = [...(shared("workspace.panels") ?? ["files", "changes"]), ...(find(root, "checks") ? ["checks"] : [])];
     this.syncPanel(space, panel, body, enabled);
-    const panelButton = (id, label, icon) => {
+    const panelButton = (id, label, icon, dot = null) => {
       const on = panel && !panel.hidden && body?.active === id;
       return h_flex().id(`panel-${id}`).h(26).px(8).gap(5).flex_none().items_center().rounded(6)
         .text_size(12).bg(on ? t.selected : t.chrome).text_color(on ? t.foreground : t.muted)
@@ -272,8 +272,11 @@ export default class Tabs extends View {
         .on_click(() => {
           if (on) run("layout.hide", { id: "panel" });
           else { run("layout.select", { stack: "panel-body", child: id }); run("layout.show", { id: "panel" }); }
-        }).child(svg(icon).size(14)).child(label);
+        }).child(svg(icon).size(14)).child(label)
+        .when(Boolean(dot), el => el.child(div().size(6).rounded(3).bg(dot)));
     };
+    // The Checks button's dot: the active space's PR checks failing (red) or running (yellow), from pr-watch.
+    const ci = (shared("pr.status") ?? {})[spaces().find(s => s.active)?.id]?.pr?.ci;
     return h_flex().size_full().min_w(0).px(10).pl(lightsPadding).gap(3).items_center().bg(t.chrome).border_b(1).border_color(t.border)
       .on_mouse_up("left", () => { this.pressed = null; })
       .on_scroll_wheel(e => this.wheel(e))
@@ -284,7 +287,7 @@ export default class Tabs extends View {
       .when(enabled.includes("files"), el => el.child(panelButton("files", "Files", "mods/files/file.svg")))
       .when(enabled.includes("changes"), el => el.child(panelButton("changes", "Changes", "mods/changes/changes.svg")))
       // Checks (pr-checks) isn't in Herdr's panel picker: on whenever the layout has it.
-      .when(enabled.includes("checks"), el => el.child(panelButton("checks", "Checks", "mods/pr-checks/checks.svg")))
+      .when(enabled.includes("checks"), el => el.child(panelButton("checks", "Checks", "mods/pr-checks/checks.svg", ci === "fail" ? t.blocked : ci === "run" ? t.working : null)))
       .when(w?.buttons, el => el.child(button("minimize", w.platform === "windows" ? svg("mods/tab-pin/win-min.svg").size(16) : "−", () => run("window.minimize")))
         .child(button("maximize", w.platform === "windows" ? svg(`mods/tab-pin/${w.maximized ? "win-restore" : "win-max"}.svg`).size(16) : "□", () => run("window.maximize")))
         .child(button("close-window", w.platform === "windows" ? svg("mods/tab-pin/win-close.svg").size(16) : svg("mods/tab-pin/close.svg").size(13), () => run("window.close"))));
